@@ -18,7 +18,11 @@ public:
                   :m_pinPWM(f_pinPWM)
                   ,m_pinA(f_pinA)
                   ,m_pinB(f_pinB)
-  {}
+  {
+    pinMode(f_pinPWM,OUTPUT);
+    pinMode(f_pinA,OUTPUT);
+    pinMode(f_pinB,OUTPUT);
+  }
   void setMotorPWMForward( uint8_t         f_speedPWM){
     f_speedPWM=f_speedPWM%256;
     digitalWrite(m_pinA,HIGH);

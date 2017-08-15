@@ -1,6 +1,6 @@
 #include <main.h>
 
-_Main_                                    mainObject;
+extern _Main_                                    mainObject;
 
 void setup(){
   mainObject.setup();
