@@ -1,7 +1,9 @@
 #ifndef DISCRETE_SYSTEM_HEADER
 #define DISCRETE_SYSTEM_HEADER
 
-#include <PolynomialFunction.h>
+#include "../Util/PolynomialFunction.h"
+
+
 
 template<class T,uint32_t N>
 class CProcessMemories{
@@ -39,8 +41,8 @@ private:
 template<class T,uint32_t N,uint32_t M>
 class CDiscreteSystem{
 public:
-  CDiscreteSystem(  Array<T,N> f_num
-                    ,Array<T,M> f_denum
+  CDiscreteSystem(  Array<T,N+1> f_num
+                    ,Array<T,M+1> f_denum
                     )
                     :m_input()
                     ,m_output()
@@ -49,8 +51,8 @@ public:
   {
   }
 
-  CDiscreteSystem(  MyMath::CPolynomialFunction<T,N-1>    f_num
-                    ,MyMath::CPolynomialFunction<T,M-1>   f_denum)
+  CDiscreteSystem(  MyMath::CPolynomialFunction<T,N>    f_num
+                    ,MyMath::CPolynomialFunction<T,M>   f_denum)
                     :m_input()
                     ,m_output()
                     ,m_num(f_num)
@@ -67,8 +69,8 @@ public:
   {}
 
 
-  void setCoefficients(  Array<T,N> f_num
-                            ,Array<T,M> f_denum)
+  void setCoefficients(  Array<T,N+1> f_num
+                        ,Array<T,M+1> f_denum)
   {
     m_num.setCoefficients(f_num);
     m_denum.setCoefficients(f_denum);
@@ -84,10 +86,18 @@ public:
     return l_output;
   }
 
+  MyMath::CPolynomialFunction<T,N> getNumerator(){
+    return m_num;
+  }
+
+  MyMath::CPolynomialFunction<T,N> getDenominator(){
+    return m_denum;
+  }
+
 protected:
   float calculatingNumitor(float f_input){
     float l_result=0;
-    for(uint16_t i=1;i<N;++i){
+    for(uint16_t i=1;i<N+1;++i){
       l_result+=m_input[i-1]*m_num[i];
     }
     l_result+=f_input*m_num[0];
@@ -97,16 +107,16 @@ protected:
 
   float calculatingDenumitor(){
     float l_result=0;
-    for(uint16_t i=1;i<M;++i){
+    for(uint16_t i=1;i<M+1;++i){
       l_result+=m_output[i-1]*m_denum[i];
     }
     return l_result;
   }
 
-  CProcessMemories<T,N-1> m_input;
-  CProcessMemories<T,M-1> m_output;
-  MyMath::CPolynomialFunction<T,N-1> m_num;
-  MyMath::CPolynomialFunction<T,M-1> m_denum;
+  CProcessMemories<T,N> m_input;
+  CProcessMemories<T,M> m_output;
+  MyMath::CPolynomialFunction<T,N> m_num;
+  MyMath::CPolynomialFunction<T,M> m_denum;
 };
 
 #endif

@@ -2,5 +2,6 @@
 #define UTIL_H
 
 void incrementalLeftSensor();
+void incrementalRightSensor();
 
 #endif

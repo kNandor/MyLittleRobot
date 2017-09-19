@@ -35,6 +35,12 @@ public:
     digitalWrite(m_pinB,HIGH);
     analogWrite(m_pinPWM,f_speedPWM);
   }
+  void setBraking(        uint8_t         f_speedPWM){
+    f_speedPWM=f_speedPWM%256;
+    digitalWrite(m_pinA,LOW);
+    digitalWrite(m_pinB,LOW);
+    analogWrite(m_pinPWM,f_speedPWM);
+  }
 private:
   const uint8_t m_pinPWM;
   const uint8_t m_pinA;

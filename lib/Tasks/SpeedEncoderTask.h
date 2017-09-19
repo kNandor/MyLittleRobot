@@ -1,7 +1,8 @@
 #ifndef SPEED_ENCODER_TASK_HEADER
 #define SPEED_ENCODER_TASK_HEADER
+
 #include <TaskManager.h>
-#include <SpeedEncoder.h>
+#include <EncoderTask.h>
 #include <Filter.h>
 
 
@@ -12,7 +13,7 @@ public:
 class CSpeedEncoderFilterTask:public CTask,public CSpeedEncoderFilterFnc{
 public:
   CSpeedEncoderFilterTask(    uint32_t            f_period
-                              ,CSpeedGetterFnc&    f_sensorGetterFnc
+                              ,CSpeedGetterFnc&   f_sensorGetterFnc
                               ,Filter::FIR::CFilterFnc&        f_filterFnc)
                               :CTask(f_period)
                               ,m_sensorGetterFnc(f_sensorGetterFnc)
@@ -21,6 +22,7 @@ public:
   void        _run(){
     CSpeedData l_data=m_sensorGetterFnc.getData();
     m_filteredValue=m_filterFnc.filtering(l_data.rps);
+    // m_filteredValue=5;
   }
 
   float      getFilteredRotation(){
@@ -29,7 +31,7 @@ public:
 private:
   CSpeedGetterFnc&             m_sensorGetterFnc;
   Filter::FIR::CFilterFnc&     m_filterFnc;
-  float                             m_filteredValue;
+  float                        m_filteredValue;
 };
 
 

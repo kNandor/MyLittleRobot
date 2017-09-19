@@ -7,9 +7,37 @@
 #endif
 
 #include <stdint.h>
-#include <Array.h>
+#include "Array.h"
 
 namespace MyMath{
+  uint32_t factorial(uint32_t l_n){
+    if(l_n<2){
+      return 1;
+    }
+    uint32_t l_res=1;
+    for(uint32_t i=2;i<=l_n;i++){
+      l_res*=i;
+    }
+    return l_res;
+  }
+
+  template<uint32_t N>
+  Array<float,N+1> binomialCoefficient(){
+    if(N==1){
+      Array<float,N+1> l_coeff=Array<float,N+1>::ones();
+      return l_coeff;
+    }
+    Array<float,N+1> l_coeff;
+    uint32_t l_Nr=(N+1)/2;
+    uint32_t l_facN=factorial(N);
+    for(uint32_t i=0;i<=l_Nr;++i){
+      uint32_t l_facI=factorial(i);
+      uint32_t l_facNI=factorial(N-i);
+      l_coeff[i]=l_facN/l_facI/l_facNI;
+      l_coeff[N-i]=l_coeff[i];
+    }
+    return l_coeff;
+  }
 
   class CFunction{
     public:
@@ -36,6 +64,7 @@ namespace MyMath{
     }
 
     CPolynomialFunction(){
+      m_coeff=coeff_type::zeros();
     }
 
     void setCoefficients(coeff_type f_coeff){

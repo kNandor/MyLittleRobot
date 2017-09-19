@@ -33,7 +33,7 @@ public:
   CTaskManager( const float               f_baseTick
                 ,uint32_t                 f_nrTask
                 ,CTask**                  f_tasks)
-                :m_baseTick(f_baseTick*1e6)
+                :m_baseTick(static_cast<uint32_t>(f_baseTick*1e6))
                 ,m_nrTask(f_nrTask)
                 ,m_tasks(f_tasks)
   {
@@ -43,8 +43,10 @@ public:
 
   void run(){
     uint64_t l_timestamp_us=micros();
+    if(m_timestamp>l_timestamp_us){
+      m_timestamp=0;//millis restart
+    }
     if(l_timestamp_us-m_timestamp>=m_baseTick){
-      l_timestamp_us=micros();
       m_timestamp=l_timestamp_us;
       for(uint32_t i=0;i<m_nrTask;++i){
         m_tasks[i]->checkTask();
@@ -53,8 +55,8 @@ public:
   }
 private:
   // const float       m_baseTick;
-  const uint64_t    m_baseTick;
-  uint64_t          m_timestamp;
+  const uint32_t    m_baseTick;
+  uint32_t          m_timestamp;
   const uint32_t    m_nrTask;
   CTask**           m_tasks;
 
