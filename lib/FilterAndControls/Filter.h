@@ -35,6 +35,9 @@ namespace Filter{
         {
           MyMath::CPolynomialFunction<float,N> l_den=this->calculateDenominator();
           MyMath::CPolynomialFunction<float,N> l_num=this->calculateNumerator();
+          float l_c=l_den[0];
+          l_num=l_num/l_c;
+          l_den=l_den/l_c;
           this->setCoefficients(l_num.getCoefficiences(),l_den.getCoefficiences());
         }
 

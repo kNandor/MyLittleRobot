@@ -6,7 +6,7 @@ dt=0.01
 wn=12.5
 order=2
 
-savedData=open("/home/nandi/Workspaces/MyProjects/PythonWorkSpace/DataSaver/DataFiltered2.out",'r')
+savedData=open("/home/nandi/Workspaces/MyProjects/arduino/MyLittleRobot/pythonCode/dataSaved/DataAccel/Data_Pwm70.csv",'r')
 
 
 pwm_a=[]

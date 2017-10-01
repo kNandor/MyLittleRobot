@@ -107,16 +107,21 @@ _Main_::_Main_()
   ,m_motorDriverR(6,8,12)
   ,m_motorDriverL(5,4,7)
 //Encoder Filters
-  ,m_rightFilter(10.5,0.0075)
-  ,m_leftFilter(10.5,0.0075)
+  ,m_rightFilter(10,0.0075)
+  ,m_leftFilter(10,0.0075)
 //Pid controller
-  ,m_pidRight(7.669549199439247, 28.489911535208886, 0.33785752719167905,150,0.0075)
-  ,m_pidLeft(7.669549199439247, 28.489911535208886, 0.33785752719167905,150,0.0075)
+  // ,m_pidRight(7.669549199439247, 28.489911535208886, 0.33785752719167905,150,0.0075)
+  // ,m_pidRight(13.0129,30.3066,0.0,0.0075/2.000,0.0075)
+  // ,m_pidRight(202.9872,665.3552,14.5719e-1,0.00075*1,0.0075)
+  //0.00075*0.1
+  ,m_pidRight(202.9872,665.3552,17.5719e-1*4.75,0.0075*0.1,0.0075)
+  ,m_pidLeft(202.9872,665.3552,17.5719e-1*4.75,0.0075*0.1,0.0075)
+  // ,m_pidLeft(0,0,0,0,0.0075)1
 // Tasks
   ,m_baseTick(5.0e-5)
   ,m_runTest(0.0070/m_baseTick,0.0070)
   ,m_builtinLedBlinker(LED_BUILTIN,1.0/m_baseTick)
-  ,m_serialHandler(2.0e-4/m_baseTick,Serial)
+  ,m_serialHandler(1.0e-4/m_baseTick,Serial)
   ,m_mpuTask(0.0075/m_baseTick,m_mpuDriver)
   ,m_RigthEncoderTask(0.0075/m_baseTick,0.0075,40,m_incrementalRight)
   ,m_LeftEncoderTask(0.0075/m_baseTick,0.0075,40,m_incrementalLeft)
@@ -127,7 +132,7 @@ _Main_::_Main_()
   ,m_tasks({&m_builtinLedBlinker,&m_runTest,&m_serialHandler,&m_mpuTask,&m_RigthEncoderTask,&m_FilterRightTask,&m_mctlRight,&m_LeftEncoderTask,&m_FilterLeftTask,&m_mctlLeft})
   //
   ,m_taskManager(m_baseTick,NR_TASKS,m_tasks)
-  ,m_interval_us(0.05e6)
+  ,m_interval_us(0.0075e6)
 {
   // m_interval_us=0.1e6;
   m_PWM=0;
@@ -159,14 +164,18 @@ void _Main_::loop(){
 
 void _Main_::stepChanger(){
   uint32_t l_timestamp_us=micros();
-  if(l_timestamp_us-m_timestamp_step_us>2.e6){
+  if(l_timestamp_us-m_timestamp_step_us>1.5e6){
+    // m_motorDriverL.setMotorPWMForward(0);
+    // m_motorDriverR.setMotorPWMForward(0);
     m_mctlRight.setRefRps(0.0f);
     m_mctlLeft.setRefRps(0.0f);
 
   }
   else{
-    m_mctlRight.setRefRps(4.0f);
-    m_mctlLeft.setRefRps(4.0f);
+    // m_motorDriverL.setMotorPWMForward(125);
+    // m_motorDriverR.setMotorPWMForward(125);
+    m_mctlRight.setRefRps(6.6f);
+    m_mctlLeft.setRefRps(6.6f);
   }
 }
 
@@ -181,16 +190,27 @@ void _Main_::periodicSender(){
       // uint32_t l_dur=m_runTest.getDuration();
       float l_rpsRight=m_FilterRightTask.getFilteredRotation();
       float l_rpsLeft=m_FilterLeftTask.getFilteredRotation();
+      float l_rpsR=m_RigthEncoderTask.getRps();
+      float l_rpsL=m_LeftEncoderTask.getRps();
       CMPU6050Driver::MPU6050_DATA l_data=m_mpuTask.get();
-      m_serialHandler.append("%s,%s,%s,%s,%s,%s,%s,%s\n"
-                                          ,String(l_rpsRight,2).c_str()
+      float l_error=m_pidRight.getError();
+      float l_pwmLeft=(m_mctlLeft.m_pwm)/255.0;
+      float l_pwmRight=(m_mctlRight.m_pwm)/255.0;
+      // ,%s,%s,%s,%s,%s,%s
+      m_serialHandler.append("%s,%s\n"
                                           ,String(l_rpsLeft,2).c_str()
-                                          ,String(l_data.x_accel,2).c_str()
-                                          ,String(l_data.y_accel,2).c_str()
-                                          ,String(l_data.z_accel,2).c_str()
-                                          ,String(l_data.x_gyro,2).c_str()
-                                          ,String(l_data.y_gyro,2).c_str()
-                                          ,String(l_data.z_gyro,2).c_str()
+                                          ,String(l_rpsRight,2).c_str()
+                                          // ,String(l_rpsLeft,2).c_str()
+                                          // ,String(l_error,2).c_str()
+                                          // ,String(l_pwmRight*5.0,2).c_str()
+                                          // ,String(l_pwmLeft*5.0,2).c_str()
+                                          // ,String(l_rpsR,2).c_str()
+      //                                     // ,String(l_data.x_accel,2).c_str()
+      //                                     // ,String(l_data.y_accel,2).c_str()
+      //                                     // ,String(l_data.z_accel,2).c_str()
+      //                                     // ,String(l_data.x_gyro,2).c_str()
+      //                                     // ,String(l_data.y_gyro,2).c_str()
+      //                                     // ,String(l_data.z_gyro,2).c_str()
                                         );
       // m_serialHandler.append("HHHHH HHHHH \n");
 

@@ -21,11 +21,11 @@ public:
   CPIDController(float          f_kp
                   ,float        f_ki
                   ,float        f_kd
-                  ,float        f_N
+                  ,float        f_tf
                   ,float        f_dt)
                   :m_kp(f_kp)
-                  ,m_Isys({f_ki*f_dt,0},{1,-1})
-                  ,m_Dsys({f_kd*f_N,-f_kd*f_N},{1,-1+f_N*f_dt})
+                  ,m_Isys({0,f_ki*f_dt},{1,-1})
+                  ,m_Dsys({f_kd,-1*f_kd},{f_tf+f_dt,-1*f_tf})
   {
     // Array<float,2> l_numI,l_denI,l_numD,l_denD;
     // l_numI={f_ki*f_dt,0};l_denI={1,-1};
@@ -36,13 +36,18 @@ public:
 
   float controlling(float f_error){
     float l_kp_res=f_error*m_kp;
+    m_error=f_error;
     float l_ki_res=m_Isys.calculating(f_error);
     float l_kd_res=m_Dsys.calculating(f_error);
     return l_kp_res+l_ki_res+l_kd_res;
   }
+  float getError(){
+    return m_error;
+  }
 
 private:
   const float                       m_kp;
+  float                             m_error;
   CDiscreteSystem<float,1,1>        m_Isys;
   CDiscreteSystem<float,1,1>        m_Dsys;
 };

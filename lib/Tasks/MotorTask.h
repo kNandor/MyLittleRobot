@@ -40,12 +40,13 @@ public:
     float l_abs_ref=m_ref_rps>0?m_ref_rps:-m_ref_rps;
     float l_error=l_abs_ref-l_rps;
     float l_control_volt=m_controller.controlling(l_error);
-    uint8_t l_pwm=0;
+
+    uint8_t l_pwm=l_control_volt;
     bool isBraking=false;
-    if(l_control_volt>12){
+    if(l_control_volt>255){
       l_pwm=255;
     }else if(l_control_volt>0){
-      l_pwm=CConvertorPWMVOLT::volt2pwm(l_control_volt);
+      l_pwm=l_control_volt;
     }else{
       l_pwm=0;
       isBraking=true;
@@ -56,8 +57,10 @@ public:
     }else{
       if(m_ref_rps>0){
         m_motorDriver.setMotorPWMForward(l_pwm);
-      }else{
+      }else if(m_ref_rps<0){
         m_motorDriver.setMotorPWMBack(l_pwm);
+      }else{
+        m_motorDriver.setBraking(255);
       }
     }
     m_pwm=l_pwm;
